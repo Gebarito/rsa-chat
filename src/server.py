@@ -1,7 +1,11 @@
-import socket
-import threading
+import socket, threading
+from rsa import generate_keys
 
+SERVER_ADDRESS="127.0.0.1"
+SERVER_PORT=12000
 connections = []
+private_key = None
+public_key = None
 
 def handle_client(client) -> None:
     '''
@@ -45,5 +49,22 @@ def run_server() -> None:
         print(f"Conectado a {addr}")
         threading.Thread(target=handle_client, args=(client,)).start()
 
+def genSessionKeys():
+    '''
+        Gera as chaves pública e privada da sessão.
+
+        return: Chave pública e chave privada
+    '''
+    public_key, private_key = generate_keys()
+    print(f"Chave pública: {public_key}")
+    print(f"Chave privada: {private_key}")
+
+    return public_key, private_key
+
 if __name__ == "__main__":
+    private_key, public_key = genSessionKeys()
     run_server()
+
+    for conn in connections:
+        conn.close()
+    print("Servidor encerrado.")
