@@ -15,9 +15,9 @@ def send_message(client: socket.socket) -> None:
         message = input("Digite a mensagem: ")
         if message == 'quit':
             break
-        message = f"{username}: {message}"
+        message = username + ": " + message
         message = rsa.encrypt(message, server.public_key)
-        client.send(message.encode('utf-8'))
+        client.send(str(message.encode('utf-8')))
 
 def receive_message(client: socket.socket) -> None:
     while True:
@@ -35,8 +35,5 @@ if __name__ == "__main__":
     conn = start_client()
     username = input("Digite seu nome: ")
 
-    while conn:
-        threading.Thread(target=send_message, args=(conn,)).start()
-        threading.Thread(target=receive_message, args=(conn,)).start()
-
-    conn.close()
+    threading.Thread(target=send_message, args=(conn,)).start()
+    threading.Thread(target=receive_message, args=(conn,)).start()
